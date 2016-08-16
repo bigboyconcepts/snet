@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="network_error">An error occurred while connecting to the server.</string>
+    <string name="no_connection_dialog_message">An internet connection is required to continue.\n\nPlease check if your device is connected and try again</string>
+    <string name="no_connection_dialog_title">No Connection</string>
+    <string name="please_wait">Please wait...</string>
+    <string name="unknown_error">An error occurred, please try again.</string>
+    
+</resources>

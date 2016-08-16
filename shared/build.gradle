@@ -1,0 +1,88 @@
+plugins {
+    id 'java'
+    id 'com.github.j2objccontrib.j2objcgradle' version '0.6.0-alpha'
+    id 'maven'
+    id 'signing'
+}
+
+group 'com.tehnicomsolutions'
+version '2.0.2'
+
+sourceCompatibility = 1.7
+targetCompatibility = 1.7
+
+repositories {
+    mavenCentral()
+}
+
+task sourcesJar(type: Jar, dependsOn: classes) {
+    classifier = 'sources'
+    from sourceSets.main.allSource
+}
+
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    classifier = 'javadoc'
+    from javadoc.destinationDir
+}
+
+javadoc {
+    failOnError false
+}
+
+artifacts {
+    archives javadocJar
+    archives sourcesJar
+}
+
+signing {
+    required { has("release") && gradle.taskGraph.hasTask("uploadArchives") }
+    sign configurations.archives
+}
+
+uploadArchives {
+    repositories {
+        mavenDeployer {
+            beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
+
+            configuration = configurations.archives
+            repository(url: "scp://maven.android-forever.com/var/www/vhosts/pedjaapps.net/maven.android-forever.com") {
+                authentication(userName: androidforeverSshUsername, privateKey: androidforeverSshPrivateKey, passphrase: androidforeverSshPassphrase)
+            }
+
+            pom.project {
+                artifactId 'ts-http-java'
+                name 'ts-http-java'
+                packaging 'jar'
+                description 'HTTP wrapper'
+                url 'http://gitlab.pedjaapps.net/pedja/ts-http'
+
+                licenses {
+                    license {
+                        name 'The Apache Software License, Version 2.0'
+                        url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                        distribution 'repo'
+                    }
+                }
+
+                developers {
+                    developer {
+                        id 'pedja1'
+                        name 'Predrag Čokulov'
+                    }
+                }
+            }
+        }
+    }
+}
+
+dependencies {
+    compile fileTree(dir: 'libs', include: ['*.jar'])
+    archives "org.apache.maven.wagon:wagon-ssh:2.2"
+}
+
+j2objcConfig {
+    translateArgs '--prefixes', 'src/main/resources/prefixes.properties'
+    testMinExpectedTests 0
+    skipJ2objcVerification true
+    finalConfigure()
+}
