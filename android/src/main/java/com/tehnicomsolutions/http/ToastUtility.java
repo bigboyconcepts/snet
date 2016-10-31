@@ -1,10 +1,12 @@
 package com.tehnicomsolutions.http;
 
 import android.content.Context;
+import android.os.Parcelable;
 import android.text.Html;
 import android.view.View;
 
-import com.github.johnpersano.supertoasts.SuperToast;
+import com.github.johnpersano.supertoasts.library.Style;
+import com.github.johnpersano.supertoasts.library.SuperToast;
 
 import java.util.LinkedList;
 
@@ -30,11 +32,14 @@ public class ToastUtility
         if(currentToast == null)
         {
             currentToast = newMessage;
+            Style style = new Style();
+            style.type = Style.TYPE_STANDARD;
+            style.frame = Style.FRAME_STANDARD;
             final SuperToast toast = SuperToast.create(context, Html.fromHtml(message), length);
             toast.setOnDismissListener(new SuperToast.OnDismissListener()
             {
                 @Override
-                public void onDismiss(View view)
+                public void onDismiss(View view, Parcelable token)
                 {
                     currentToast = toastQueue.isEmpty() ? null : toastQueue.removeFirst();
                     if(currentToast != null)
@@ -55,7 +60,7 @@ public class ToastUtility
 
     public static void showToast(Context context, String message)
     {
-        showToast(context, message, SuperToast.Duration.VERY_SHORT);
+        showToast(context, message, Style.DURATION_SHORT);
     }
 
     private static final class ToastMessage

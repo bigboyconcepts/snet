@@ -2,7 +2,7 @@ package com.tehnicomsolutions.http;
 
 import android.content.Context;
 
-import com.github.johnpersano.supertoasts.SuperToast;
+import com.github.johnpersano.supertoasts.library.Style;
 
 /**
  * Created by pedja on 3/12/16.
@@ -10,7 +10,7 @@ import com.github.johnpersano.supertoasts.SuperToast;
 public class AndroidUI implements UI
 {
     private Context context;
-    private int toastLength = SuperToast.Duration.LONG;
+    private int toastLength = Style.DURATION_LONG;
 
     public AndroidUI(Context context)
     {
