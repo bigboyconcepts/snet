@@ -144,4 +144,21 @@
     return response;
 }
 
+- (NSURLRequest *)connection: (NSURLConnection *)connection
+             willSendRequest: (NSURLRequest *)request
+            redirectResponse: (NSURLResponse *)redirectResponse;
+{
+    if (redirectResponse) {
+        // we don't use the new request built for us, except for the URL
+        NSURL *newURL = [request URL];
+        // Previously, store the original request in _originalRequest.
+        // We rely on that here!
+        NSMutableURLRequest *newRequest = [request mutableCopy];
+        [newRequest setURL: newURL];
+        return newRequest;
+    } else {
+        return request;
+    }
+}
+
 @end
