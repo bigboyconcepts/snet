@@ -12,7 +12,7 @@ apply plugin: 'maven'
 apply plugin: 'signing'
 
 group = 'com.tehnicomsolutions'
-version = '2.0.5'
+version = '2.0.6'
 
 repositories {
     jcenter()
@@ -24,11 +24,11 @@ repositories {
 
 android {
     compileSdkVersion 24
-    buildToolsVersion "24.0.3"
+    buildToolsVersion "25.0.2"
 
     defaultConfig {
         minSdkVersion 14
-        targetSdkVersion 24
+        targetSdkVersion 25
     }
 
     packagingOptions {

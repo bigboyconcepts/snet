@@ -5,21 +5,22 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
 
+import com.tehnicomsolutions.http.AndroidInternet;
+import com.tehnicomsolutions.http.AndroidNetwork;
 import com.tehnicomsolutions.http.AndroidRequestHandler;
+import com.tehnicomsolutions.http.AndroidRequestManager;
+import com.tehnicomsolutions.http.AndroidTextManager;
+import com.tehnicomsolutions.http.AndroidUI;
 import com.tehnicomsolutions.http.Http;
 import com.tehnicomsolutions.http.Internet;
-import com.tehnicomsolutions.http.AndroidInternet;
 import com.tehnicomsolutions.http.Network;
-import com.tehnicomsolutions.http.AndroidNetwork;
 import com.tehnicomsolutions.http.Request;
 import com.tehnicomsolutions.http.RequestManager;
-import com.tehnicomsolutions.http.AndroidRequestManager;
 import com.tehnicomsolutions.http.ResponseHandler;
 import com.tehnicomsolutions.http.ResponseParser;
 import com.tehnicomsolutions.http.TextManager;
-import com.tehnicomsolutions.http.AndroidTextManager;
+import com.tehnicomsolutions.http.ToastUtility;
 import com.tehnicomsolutions.http.UI;
-import com.tehnicomsolutions.http.AndroidUI;
 
 public class MainActivity extends Activity
 {
@@ -29,6 +30,9 @@ public class MainActivity extends Activity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         final TextView tvResponse = (TextView)findViewById(R.id.tvResponse);
+
+        ToastUtility.showToast(this, "Bla bla bla");
+        ToastUtility.showToast(this, "Bla bla bla2");
 
         Network network = new AndroidNetwork(this.getApplicationContext());
         Internet internet = new AndroidInternet(this.getApplicationContext());
