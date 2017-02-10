@@ -33,6 +33,18 @@ public class MainActivity extends Activity
 
         ToastUtility.showToast(this, "Bla bla bla");
         ToastUtility.showToast(this, "Bla bla bla2");
+        ToastUtility.showToast(this, "Bla bla bla3");
+        ToastUtility.showToast(this, "Bla bla bla6");
+
+        runOnUiThread(new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                ToastUtility.showToast(MainActivity.this, "Bla bla bla4");
+                ToastUtility.showToast(MainActivity.this, "Bla bla bla5");
+            }
+        });
 
         Network network = new AndroidNetwork(this.getApplicationContext());
         Internet internet = new AndroidInternet(this.getApplicationContext());

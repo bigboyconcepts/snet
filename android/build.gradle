@@ -12,7 +12,7 @@ apply plugin: 'maven'
 apply plugin: 'signing'
 
 group = 'com.tehnicomsolutions'
-version = '2.0.6'
+version = '2.0.7'
 
 repositories {
     jcenter()
@@ -113,7 +113,7 @@ uploadArchives {
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     archives "org.apache.maven.wagon:wagon-ssh:2.2"
-    compile 'org.skynetsoftware:supertoasts:2.0.0'
+    compile 'org.skynetsoftware:supertoasts:2.0.4'
 
     compile project (':ts-http-shared')
 
