@@ -698,15 +698,63 @@ public class Request implements Serializable
          * Uri of the image for uploading file to server*/
 
         @Nonnull
-        public String uri;
+        private String uri;
 
         /**
          * Name of the file*/
-        public String fileName;
+        private String fileName;
 
         /**
          * Mime type of file for uploading file to server<br>*/
-        public String mimeType;
+        private String mimeType;
+
+        /**
+         * <pre>
+         * If > 0 image will be rescaled to be equal or less than specified value
+         *
+         * </pre>*/
+        private int maxImageSize;
+
+        @Nonnull
+        public String getUri()
+        {
+            return uri;
+        }
+
+        public void setUri(@Nonnull String uri)
+        {
+            this.uri = uri;
+        }
+
+        public String getFileName()
+        {
+            return fileName;
+        }
+
+        public void setFileName(String fileName)
+        {
+            this.fileName = fileName;
+        }
+
+        public String getMimeType()
+        {
+            return mimeType;
+        }
+
+        public void setMimeType(String mimeType)
+        {
+            this.mimeType = mimeType;
+        }
+
+        public int getMaxImageSize()
+        {
+            return maxImageSize;
+        }
+
+        public void setMaxImageSize(int maxImageSize)
+        {
+            this.maxImageSize = maxImageSize;
+        }
     }
 
     private static boolean isEmpty(@Nullable CharSequence str)
