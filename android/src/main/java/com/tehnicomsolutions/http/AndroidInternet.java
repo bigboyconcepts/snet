@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
+import android.support.annotation.NonNull;
 import android.util.Log;
 
 import java.io.ByteArrayInputStream;
@@ -27,20 +28,6 @@ import java.net.URLConnection;
 
 public class AndroidInternet extends Internet
 {
-    /**
-     * HTTP connection timeout
-     * */
-    public static int CONN_TIMEOUT = 2 * 60 * 1000;
-
-    /**
-     * URL encoding
-     * */
-    public static final String ENCODING = "UTF-8";
-
-    private static final boolean printResponse = Http.LOGGING && true;
-
-    private static final String LINE_FEED = "\r\n";
-
     protected final Context context;
 
     public AndroidInternet(Context context)
@@ -51,7 +38,7 @@ public class AndroidInternet extends Internet
     }
 
     @Override
-    public Response executeHttpRequest(Request request)
+    public Response executeHttpRequest(@NonNull Request request)
     {
         return executeHttpRequest(request, true);
     }
@@ -65,7 +52,7 @@ public class AndroidInternet extends Internet
      * @return server response as string
      */
     @Override
-    public Response executeHttpRequest(Request request, boolean streamToString)
+    public Response executeHttpRequest(@NonNull Request request, boolean streamToString)
     {
         MyTimer timer = new MyTimer();
         Response response = new Response();
@@ -259,7 +246,8 @@ public class AndroidInternet extends Internet
                 return new ByteArrayInputStream(bitmapData);
             }
         }
-
+        //since we used input stream above, create new one here
+        inputStream = createInputStreamFromUploadFile(file);
         return inputStream;
     }
 
