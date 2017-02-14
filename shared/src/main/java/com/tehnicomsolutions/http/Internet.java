@@ -204,11 +204,15 @@ public abstract class Internet
         return response;
     }
 
+    /**
+     * Rescale image if {@link Request.UploadFile#maxImageSize} > 0*/
     protected InputStream rescaleImageIfNecessary(Request.UploadFile file) throws IOException
     {
         throw new IllegalStateException("rescaleImageIfNecessary has no default implementation yet, will be done soon");
     }
 
+    /**
+     * Set parameters for {@link Request.PostMethod#X_WWW_FORM_URL_ENCODED}*/
     protected static void setXWwwFormUrlEncodedParams(HttpURLConnection conn, Request requestBuilder) throws IOException
     {
         StringBuilder builder = new StringBuilder();
@@ -224,6 +228,8 @@ public abstract class Internet
         wr.close();
     }
 
+    /**
+     * Read {@link InputStream} to {@link String}*/
     public static String readStreamToString(InputStream stream) throws IOException
     {
         MyTimer timer = new MyTimer();
@@ -238,6 +244,8 @@ public abstract class Internet
         return string.toString();
     }
 
+    /**
+     * Create {@link InputStream} from {@link Request.UploadFile}*/
     protected InputStream createInputStreamFromUploadFile(Request.UploadFile file) throws FileNotFoundException
     {
         if (file.getUri().startsWith("/"))
@@ -251,6 +259,8 @@ public abstract class Internet
         return null;
     }
 
+    /**
+     * Convenient method for closing multiple {@link Closeable} Objects*/
     protected static void close(Closeable... closeables)
     {
         for (Closeable c : closeables)
@@ -269,16 +279,33 @@ public abstract class Internet
 
     public static class Response
     {
-        public int code = -1;
-        public String responseMessage;
-        public String responseDetailedMessage;
         /**
-         * On android this is input stream, on ios this is NSData
-         */
+         * HTTP response code*/
+        public int code = -1;
+
+        /**
+         * HTTP response code, eg 'OK' for code 200*/
+        public String responseMessage;
+
+        /**
+         * Mostly Exception message, Exception.getMessage()*/
+        public String responseDetailedMessage;
+
+        /**
+         * String content from responseData*/
         public String responseDataString;
+
+        /**
+         * On android/java this is InputStream, on iOS this is NSData
+         */
         public Object responseData;
+
+        /**
+         * Request url*/
         public String request;
 
+        /**
+         * Checks if response is OK, if code is > 0 and code < 400 then response is OK*/
         public boolean isResponseOk()
         {
             return code > 0 && code < 400;
