@@ -28,13 +28,13 @@ public class ResponseHandlerImpl implements ResponseHandler
         if (responseParser.getResponseStatus() == ResponseParser.RESPONSE_STATUS_SUCCESS)
         {
             if(responseParser.getResponseMessage() != null && responseMessagePolicy.showSuccessMessages)
-                Http.getInstance().ui.showToast(responseParser.getResponseMessage());
+                Http.getInstance().getUi().showToast(responseParser.getResponseMessage());
         }
         else
         {
             if(responseMessagePolicy.showErrorMessages)
             {
-                Http.getInstance().ui.showToast(responseParser.getResponseMessage() != null ? responseParser.getResponseMessage() : Http.getInstance().textManager.getText("unknown_error"));
+                Http.getInstance().getUi().showToast(responseParser.getResponseMessage() != null ? responseParser.getResponseMessage() : Http.getInstance().getTextManager().getText("unknown_error"));
             }
         }
         onResponse(requestCode, responseParser.getResponseStatus(), responseParser);

@@ -181,7 +181,7 @@ public abstract class Internet
         }
         catch (IOException e)
         {
-            response.responseMessage = Http.getInstance().textManager.getText("network_error");
+            response.responseMessage = Http.getInstance().getTextManager().getText("network_error");
             response.responseDetailedMessage = e.getMessage();
         }
         finally

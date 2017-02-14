@@ -15,10 +15,10 @@ public class Http
 
     private static Http instance;
 
-    public final Network network;
-    public final Internet internet;
-    public final UI ui;
-    public final TextManager textManager;
+    private final Network network;
+    private final Internet internet;
+    private final UI ui;
+    private final TextManager textManager;
 
     private Http(Network network, Internet internet, UI ui, TextManager textManager)
     {
@@ -71,5 +71,25 @@ public class Http
             throw new IllegalStateException("You must initialize TSHttp first. Call initialize()");
         }
         return instance;
+    }
+
+    public Network getNetwork()
+    {
+        return network;
+    }
+
+    public Internet getInternet()
+    {
+        return internet;
+    }
+
+    public UI getUi()
+    {
+        return ui;
+    }
+
+    public TextManager getTextManager()
+    {
+        return textManager;
     }
 }

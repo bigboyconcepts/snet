@@ -55,7 +55,7 @@ public class ATNet extends AsyncTask<Void, Void, ResponseParser>
     @Override
     protected void onPreExecute()
     {
-        if(!Http.getInstance().network.isNetworkAvailable())//if we don't have internet connection prevent task from starting and notify user
+        if(!Http.getInstance().getNetwork().isNetworkAvailable())//if we don't have internet connection prevent task from starting and notify user
         {
             if(noInternetConnectionHandler != null)noInternetConnectionHandler.handleNoInternetConnection();
             cancel(true);
