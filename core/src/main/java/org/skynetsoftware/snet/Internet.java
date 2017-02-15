@@ -18,8 +18,6 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
 
-import javax.annotation.Nonnull;
-
 /**
  * @author Predrag Čokulov
  */
@@ -45,7 +43,7 @@ public class Internet
 
     protected static final String MULTI_PART_LINE_FEED = "\r\n";
 
-    public Response executeHttpRequest(@Nonnull Request request)
+    public Response executeHttpRequest(@NonNull Request request)
     {
         return executeHttpRequest(request, true);
     }
@@ -58,7 +56,7 @@ public class Internet
      * @param streamToString true if you want to convert input stream to string, if true you shouldn't try to use InputStream after
      * @return server response as string
      */
-    public Response executeHttpRequest(@Nonnull Request request, boolean streamToString)
+    public Response executeHttpRequest(@NonNull Request request, boolean streamToString)
     {
         MyTimer timer = new MyTimer();
         Response response = new Response();

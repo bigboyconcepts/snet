@@ -5,8 +5,6 @@ import android.util.Log;
 import java.io.Serializable;
 import java.util.HashMap;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 
 /**
@@ -53,7 +51,7 @@ public class Request implements Serializable
     private HashMap<String, String> postParams = new HashMap<>();
     private HashMap<String, String> urlParams = new HashMap<>();
 
-    @Nonnull
+    @NonNull
     private final Method mMethod;
 
     /**
@@ -65,7 +63,7 @@ public class Request implements Serializable
      * For now either {@link PostMethod#BODY}, {@link PostMethod#X_WWW_FORM_URL_ENCODED} or {@link PostMethod#FORM_DATA}<br>
      * Cannot be null<br>
      * Default is {@link PostMethod#X_WWW_FORM_URL_ENCODED}*/
-    @Nonnull
+    @NonNull
     private PostMethod postMethod = PostMethod.X_WWW_FORM_URL_ENCODED;
 
     /**
@@ -109,7 +107,7 @@ public class Request implements Serializable
      * * contentType - "text/plain"
      * </pre>
      * @param method HTTP method for this request*/
-    public Request(@Nonnull Method method)
+    public Request(@NonNull Method method)
     {
         mMethod = method;
         builder = new StringBuilder();
@@ -152,7 +150,7 @@ public class Request implements Serializable
      * Set HTTP POST method to use
      * @param postMethod HTTP POST method
      * @return this object for method chaining*/
-    public Request setPostMethod(@Nonnull PostMethod postMethod)
+    public Request setPostMethod(@NonNull PostMethod postMethod)
     {
         this.postMethod = postMethod;
         if(postMethod != PostMethod.BODY && !isEmpty(requestBody))
@@ -626,7 +624,7 @@ public class Request implements Serializable
         return mMethod;
     }
 
-    @Nonnull
+    @NonNull
     public PostMethod getPostMethod()
     {
         return postMethod;
@@ -697,7 +695,7 @@ public class Request implements Serializable
         /**
          * Uri of the image for uploading file to server*/
 
-        @Nonnull
+        @NonNull
         private String uri;
 
         /**
@@ -715,13 +713,13 @@ public class Request implements Serializable
          * </pre>*/
         private int maxImageSize;
 
-        @Nonnull
+        @NonNull
         public String getUri()
         {
             return uri;
         }
 
-        public void setUri(@Nonnull String uri)
+        public void setUri(@NonNull String uri)
         {
             this.uri = uri;
         }

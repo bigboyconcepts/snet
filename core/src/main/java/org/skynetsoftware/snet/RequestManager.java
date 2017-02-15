@@ -1,8 +1,5 @@
 package org.skynetsoftware.snet;
 
-
-import com.google.j2objc.annotations.ObjectiveCName;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -58,13 +55,11 @@ public abstract class RequestManager
         responseHandlers = new ArrayList<>();
     }
 
-    @ObjectiveCName("executeAsyncRequest:withRequestCode:")
     public ResponseParser executeAsync(Request request, int requestCode)
     {
         return execute(requestCode, request, false);
     }
 
-    @ObjectiveCName("executeSyncRequest:withRequestCode:")
     public ResponseParser executeSync(Request request, int requestCode)
     {
         return execute(requestCode, request, true);
@@ -107,7 +102,6 @@ public abstract class RequestManager
         }
     }
 
-    @ObjectiveCName("runOnUIThread:")
     protected abstract void runOnUIThread(Runnable runnable);
 
     private void runNextTaskFromQueue(int requestCode, boolean sync)
@@ -222,7 +216,6 @@ public abstract class RequestManager
      * @param cancelOtherQueuedTasksWithSameId whether to also remove all task with same requestOCde from queue
      * @param requestCode                      requestCode of the task
      */
-    @ObjectiveCName("cancelTaskWithRequestCode:andCancelOtherQueuedTasksWithSameId:")
     public void cancel(int requestCode, boolean cancelOtherQueuedTasksWithSameId)
     {
         synchronized (runningTasks)
@@ -338,7 +331,6 @@ public abstract class RequestManager
      *
      * @param responseHandler ResponseHandler to add
      */
-    @ObjectiveCName("addResponseHandler:")
     public void addResponseHandler(ResponseHandler responseHandler)
     {
         if (responseHandler == null) return;
@@ -350,7 +342,6 @@ public abstract class RequestManager
      *
      * @param responseHandler ResponseHandler to remove
      */
-    @ObjectiveCName("removeResponseHandler:")
     public void removeResponseHandler(ResponseHandler responseHandler)
     {
         this.responseHandlers.remove(responseHandler);
@@ -361,8 +352,7 @@ public abstract class RequestManager
      *
      * @param requestHandler request handler to set or null ot unset it
      */
-    @ObjectiveCName("setGlobalRequestHandler:")
-    public void setGlobalRequestHandler(org.skynetsoftware.snet.RequestHandler requestHandler)
+    public void setGlobalRequestHandler(RequestHandler requestHandler)
     {
         this.mGlobalRequestHandler = requestHandler;
     }
@@ -372,7 +362,6 @@ public abstract class RequestManager
      *
      * @param noInternetConnectionHandler NoInternetConnection handler to set or null to remove it
      */
-    @ObjectiveCName("setNoInternetConnectionHandler:")
     public void setNoInternetConnectionHandler(NoInternetConnectionHandler noInternetConnectionHandler)
     {
         this.noInternetConnectionHandler = noInternetConnectionHandler;

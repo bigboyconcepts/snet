@@ -77,4 +77,5 @@ uploadArchives {
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     archives "org.apache.maven.wagon:wagon-ssh:2.2"
+    compileOnly project(':provided')
 }
