@@ -16,25 +16,25 @@ public class RequestBuilderTest
     public void requestBuilder_addUrlPart()
     {
         //assertThat(Utility.isEmailValid("name@email.com"), is(true));
-        Request builder = new Request(Request.Method.POST);
+        org.skynetsoftware.snet.Request builder = new org.skynetsoftware.snet.Request(org.skynetsoftware.snet.Request.Method.POST);
         builder.setRequestUrl("http://example.com/");
         builder.addUrlPart("user");
         builder.addUrlPart("login");
         assertThat(builder.getRequestUrl(), is("http://example.com/user/login"));
 
-        builder = new Request(Request.Method.POST);
+        builder = new org.skynetsoftware.snet.Request(org.skynetsoftware.snet.Request.Method.POST);
         builder.setRequestUrl("http://example.com/");
         builder.addUrlPart("/user");
         builder.addUrlPart("login/");
         assertThat(builder.getRequestUrl(), is("http://example.com/user/login/"));
 
-        builder = new Request(Request.Method.POST);
+        builder = new org.skynetsoftware.snet.Request(org.skynetsoftware.snet.Request.Method.POST);
         builder.setRequestUrl("http://example.com/");
         builder.addUrlPart("/user/");
         builder.addUrlPart("/login");
         assertThat(builder.getRequestUrl(), is("http://example.com/user/login"));
 
-        builder = new Request(Request.Method.POST);
+        builder = new org.skynetsoftware.snet.Request(org.skynetsoftware.snet.Request.Method.POST);
         builder.setRequestUrl("http://example.com/");
         builder.addUrlPart("/user");
         builder.addUrlPart("/login");

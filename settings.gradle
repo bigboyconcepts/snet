@@ -1,3 +1,3 @@
-include ':example', 'ts-http-android', 'ts-http-shared'
-project(':ts-http-android').projectDir = new File('android')
-project(':ts-http-shared').projectDir = new File('shared')
+include ':example', 'snet-android', 'snet-java'
+project(':snet-android').projectDir = new File('android')
+project(':snet-java').projectDir = new File('java')
