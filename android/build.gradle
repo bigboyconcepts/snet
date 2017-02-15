@@ -115,7 +115,7 @@ dependencies {
     archives "org.apache.maven.wagon:wagon-ssh:2.2"
     compile 'org.skynetsoftware:supertoasts:2.0.4'
 
-    compile project (':snet-java')
+    compile project (':core')
 
     // Required -- JUnit 4 framework
     testCompile 'junit:junit:4.12'

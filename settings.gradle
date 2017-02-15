@@ -1,3 +1,1 @@
-include ':example', ':provided', 'snet-android', 'snet-java'
-project(':snet-android').projectDir = new File('android')
-project(':snet-java').projectDir = new File('core')
+include ':example', ':provided', ':java', ':android', ':core'

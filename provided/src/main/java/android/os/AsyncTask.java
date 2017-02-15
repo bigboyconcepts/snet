@@ -14,5 +14,5 @@ public abstract class AsyncTask<Params, Progress, Result>
     protected void onPreExecute(){}
     protected void onPostExecute(Result result){}
     protected void onCancelled(Result result){}
-    public final AsyncTask<Params, Progress, Result> executeOnExecutor(Executor exec, Params... params){ return null; }
+    public final AsyncTask<Params, Progress, Result> executeOnExecutor(Executor exec, Params... params){ return this; }
 }
