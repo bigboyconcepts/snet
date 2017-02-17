@@ -5,7 +5,6 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
 
-import org.skynetsoftware.snet.AndroidRequestHandler;
 import org.skynetsoftware.snet.Request;
 import org.skynetsoftware.snet.RequestManager;
 import org.skynetsoftware.snet.ResponseHandler;
@@ -20,8 +19,6 @@ public class MainActivity extends Activity
         setContentView(R.layout.activity_main);
         final TextView tvResponse = (TextView)findViewById(R.id.tvResponse);
 
-        RequestManager.getInstance().setGlobalRequestHandler(new AndroidRequestHandler(this));
-
         RequestManager.getInstance().addResponseHandler(new ResponseHandler()
         {
             @Override
@@ -34,10 +31,9 @@ public class MainActivity extends Activity
 
     public void makeRequest(View view)
     {
-        Request builder = new Request(Request.Method.POST);
-        builder.setPostMethod(Request.PostMethod.X_WWW_FORM_URL_ENCODED);
-        builder.setRequestUrl("http://tulfie.conveo.net/api/v1/members/login");
-        builder.addParam("asdsad", "asfdsfds  safddsfsd fsdsf");
-        RequestManager.getInstance().executeAsync(builder, 0);
+        Request request = new Request(Request.Method.GET);
+        request.setRequestHandler(new MySmartRequestHandler(this));
+        request.setRequestUrl("http://n551jk.com/demo/places_v2.json");
+        RequestManager.getInstance().executeAsync(request, MySmartRequestHandler.REQUEST_CODE_PLACES);
     }
 }
