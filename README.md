@@ -17,7 +17,7 @@ maven { url 'http://maven.android-forever.com/' }
 ```
 Add the library to your dependencies:
 ```groovy
-compile 'com.tehnicomsolutions:ts-http:2.0.4'
+compile 'org.skynetsoftware:snet-android:3.1.0'
 ```
 
 Example
@@ -37,11 +37,11 @@ Internet internet = new AndroidInternet(this);//used to make actual requests, yo
 UI ui = new AndroidUI(this);//used for diaplaying messages to user
 TextManager textManager = new AndroidTextManager(this);//used for getting text strings
 
-Http.initialize(network, internet, ui, textManager);//main initialization method
+SNet.initialize(network, internet, ui, textManager);//main initialization method
 
 Request.setDefaultRequestUrl(API.API_REQUEST_URL);//you can use this to set global request url or you can set it on each Request object sepparately
 RequestManager.initialize(new AndroidRequestManager());//initialize request manager, this is the main class for making requests
-Http.LOGGING = true;//enable or disable logging
+SNet.LOGGING = true;//enable or disable logging
 ```
 
 #### Get RequestManager instance
