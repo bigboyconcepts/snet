@@ -4,7 +4,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:2.2.3'
+        classpath 'com.android.tools.build:gradle:2.3.0'
     }
 }
 apply plugin: 'com.android.library'
@@ -12,7 +12,7 @@ apply plugin: 'maven'
 apply plugin: 'signing'
 
 group = 'org.skynetsoftware'
-version = '3.1.0'
+version = '3.1.1'
 
 repositories {
     jcenter()
@@ -70,7 +70,7 @@ artifacts {
 }
 
 signing {
-    required { has("release") && gradle.taskGraph.hasTask("uploadArchives") }
+    required { hasProperty("release") && gradle.taskGraph.hasTask("uploadArchives") }
     sign configurations.archives
 }
 
