@@ -4,7 +4,7 @@ import android.util.Log;
 
 import java.io.Serializable;
 import java.util.HashMap;
-
+import java.util.Random;
 
 
 /**
@@ -687,6 +687,31 @@ public class Request implements Serializable
         this.mRequestHandler = requestHandler;
     }
 
+    private static final Random RANDOM = new Random();
+
+    public void execute(final @NonNull ResponseListener listener)
+    {
+        final int requestCode = RANDOM.nextInt();
+        RequestManager.getInstance().addResponseHandler(new ResponseHandler()
+        {
+            @Override
+            public void onResponse(int _requestCode, int responseStatus, ResponseParser responseParser)
+            {
+                if(requestCode == _requestCode)
+                {
+                    listener.onResponse(responseParser);
+                    RequestManager.getInstance().removeResponseHandler(this);
+                }
+            }
+        });
+        RequestManager.getInstance().executeAsync(this, requestCode);
+    }
+
+    public ResponseParser execute()
+    {
+        return RequestManager.getInstance().executeSync(this, 0);
+    }
+
     /**
      * Wrapper for file that sould be uploaded<br>
      * Used only with {@link PostMethod#BODY}*/
@@ -760,4 +785,8 @@ public class Request implements Serializable
         return str == null || str.length() == 0;
     }
 
+    public interface ResponseListener
+    {
+        void onResponse(ResponseParser responseParser);
+    }
 }
