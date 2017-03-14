@@ -180,6 +180,7 @@ public class Internet
         }
         catch (IOException e)
         {
+            response.exception = e;
             response.responseMessage = SNet.getInstance().getTextManager().getText("network_error");
             response.responseDetailedMessage = e.getMessage();
         }
@@ -291,6 +292,10 @@ public class Internet
         public String responseDetailedMessage;
 
         /**
+         * If exception occurred, this is the exception*/
+        public Throwable exception;
+
+        /**
          * String content from responseData*/
         public String responseDataString;
 
@@ -316,7 +321,8 @@ public class Internet
             return "Response{" +
                     "code=" + code +
                     ", responseMessage='" + responseMessage + '\'' +
-                    ", responseDetailedMessage='" + responseDetailedMessage + '\'' +
+                    (", responseDetailedMessage='" + responseDetailedMessage) + '\'' +
+                    (exception != null ? ", exception='" + exception.toString() : "") + '\'' +
                     (PRINT_RESPONSE ? ", responseDataString='" + responseDataString : "") + '\'' +
                     '}';
         }
