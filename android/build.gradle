@@ -68,7 +68,14 @@ publishing {
 
                     def dependencyNode = dependenciesNode.appendNode('dependency')
                     dependencyNode.appendNode('groupId', dep.group)
-                    dependencyNode.appendNode('artifactId', dep.name)
+                    if(dep.name == "core" || dep.name == "java")
+                    {
+                        dependencyNode.appendNode('artifactId', "snet-" + dep.name)
+                    }
+                    else
+                    {
+                        dependencyNode.appendNode('artifactId', dep.name)
+                    }
                     dependencyNode.appendNode('version', dep.version)
 
                     if (!dep.transitive)
