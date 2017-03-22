@@ -1,26 +1,9 @@
-buildscript {
-    repositories {
-        jcenter()
-        mavenCentral()
-    }
-    dependencies {
-        classpath 'com.android.tools.build:gradle:2.3.0'
-    }
-}
 apply plugin: 'com.android.library'
-apply plugin: 'maven'
-apply plugin: 'signing'
+apply plugin: 'com.jfrog.bintray'
+apply plugin: 'maven-publish'
 
 group = 'org.skynetsoftware'
 version = '3.1.4'
-
-repositories {
-    jcenter()
-    mavenCentral()
-    mavenLocal()
-    flatDir { dirs 'aars' }
-    maven { url 'http://maven.android-forever.com/' }
-}
 
 android {
     compileSdkVersion 25
@@ -64,45 +47,46 @@ javadoc {
     failOnError false
 }
 
-artifacts {
-    archives javadocJar
-    archives sourcesJar
-}
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            groupId group
+            artifactId 'snet-android'
+            version project.version
 
-signing {
-    required { hasProperty("release") && gradle.taskGraph.hasTask("uploadArchives") }
-    sign configurations.archives
-}
+            artifact bundleRelease
+            artifact sourcesJar
+            artifact javadocJar
 
-uploadArchives {
-    repositories {
-        mavenDeployer {
-            beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
+            pom.withXml {
+                def dependenciesNode = asNode().appendNode('dependencies')
 
-            configuration = configurations.archives
-            repository(url: "scp://maven.android-forever.com/var/www/vhosts/pedjaapps.net/maven.android-forever.com") {
-                authentication(userName: androidforeverSshUsername, privateKey: androidforeverSshPrivateKey, passphrase: androidforeverSshPassphrase)
-            }
+                // List all compile dependencies and write to POM
+                configurations.compile.getAllDependencies().each { Dependency dep ->
+                    if (dep.group == null || dep.version == null || dep.name == null || dep.name == "unspecified")
+                        return // ignore invalid dependencies
 
-            pom.project {
-                artifactId 'snet-android'
-                name 'snet-android'
-                packaging 'aar'
-                description 'HTTP wrapper'
-                url 'http://gitlab.pedjaapps.net/pedja/snet'
+                    def dependencyNode = dependenciesNode.appendNode('dependency')
+                    dependencyNode.appendNode('groupId', dep.group)
+                    dependencyNode.appendNode('artifactId', dep.name)
+                    dependencyNode.appendNode('version', dep.version)
 
-                licenses {
-                    license {
-                        name 'The Apache Software License, Version 2.0'
-                        url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
-                        distribution 'repo'
+                    if (!dep.transitive)
+                    {
+                        // If this dependency is transitive, we should force exclude all its dependencies them from the POM
+                        def exclusionNode = dependencyNode.appendNode('exclusions').appendNode('exclusion')
+                        exclusionNode.appendNode('groupId', '*')
+                        exclusionNode.appendNode('artifactId', '*')
                     }
-                }
-
-                developers {
-                    developer {
-                        id 'pedja1'
-                        name 'Predrag Čokulov'
+                    else if (!dep.properties.excludeRules.empty)
+                    {
+                        // Otherwise add specified exclude rules
+                        def exclusionsNode = dependencyNode.appendNode('exclusions')
+                        dep.properties.excludeRules.each { ExcludeRule rule ->
+                            def exclusionNode = exclusionsNode.appendNode('exclusion')
+                            exclusionNode.appendNode('groupId', rule.group ?: '*')
+                            exclusionNode.appendNode('artifactId', rule.module ?: '*')
+                        }
                     }
                 }
             }
@@ -110,10 +94,29 @@ uploadArchives {
     }
 }
 
+bintray {
+    override = true
+    user = System.getenv('BINTRAY_USER')
+    key = System.getenv('BINTRAY_KEY')
+    publications = ['mavenJava']
+    pkg {
+        repo = 'maven'
+        name = 'org.skynetsoftware.snet-android'
+        licenses = ['Apache-2.0']
+        vcsUrl = 'https://github.com/pedja1/snet.git'
+        version {
+            name = project.version
+            desc = 'Async http wrapper'
+            released = new Date()
+            //vcsTag = '1.3.0'
+            //attributes = ['gradle-plugin': 'com.use.less:com.use.less.gradle:gradle-useless-plugin']
+        }
+    }
+}
+
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
-    archives "org.apache.maven.wagon:wagon-ssh:2.2"
-    compile 'org.skynetsoftware:supertoasts:2.0.4'
+    compile 'org.skynetsoftware:supertoasts:2.0.6'
 
     compile project (':core')
 
