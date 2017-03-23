@@ -419,7 +419,7 @@ public class Request implements Serializable
     {
         if(isEmpty(key) || (!mAllowEmptyValues && isEmpty(value)))
         {
-            if(SNet.LOGGING)Log.e(SNet.LOG_TAG, "RequestBuilder >> addParam : param not set");
+            if(SNet.LOGGING)Log.e(SNet.LOG_TAG, "RequestBuilder >> _addUrlPart : param not set");
             return this;
         }
         if(forceAddToUrl || mMethod == Method.GET || mMethod == Method.DELETE)
@@ -440,7 +440,7 @@ public class Request implements Serializable
      * */
     public Request addUrlPart(String part)
     {
-        return addParam(part);
+        return _addUrlPart(part);
     }
 
     /**
@@ -450,7 +450,7 @@ public class Request implements Serializable
      * */
     public Request addUrlPart(int part)
     {
-        return addParam(Integer.toString(part));
+        return _addUrlPart(Integer.toString(part));
     }
 
     /**
@@ -460,7 +460,7 @@ public class Request implements Serializable
      * */
     public Request addUrlPart(long part)
     {
-        return addParam(Long.toString(part));
+        return _addUrlPart(Long.toString(part));
     }
 
     /**
@@ -470,7 +470,7 @@ public class Request implements Serializable
      * */
     public Request addUrlPart(short part)
     {
-        return addParam(Short.toString(part));
+        return _addUrlPart(Short.toString(part));
     }
 
     /**
@@ -480,7 +480,7 @@ public class Request implements Serializable
      * */
     public Request addUrlPart(float part)
     {
-        return addParam(Float.toString(part));
+        return _addUrlPart(Float.toString(part));
     }
 
     /**
@@ -490,7 +490,7 @@ public class Request implements Serializable
      * */
     public Request addUrlPart(double part)
     {
-        return addParam(Double.toString(part));
+        return _addUrlPart(Double.toString(part));
     }
 
     /**
@@ -500,7 +500,7 @@ public class Request implements Serializable
      * */
     public Request addUrlPart(boolean part)
     {
-        return addParam(Boolean.toString(part));
+        return _addUrlPart(Boolean.toString(part));
     }
 
     /**
@@ -510,7 +510,7 @@ public class Request implements Serializable
      * */
     public Request addUrlPart(byte part)
     {
-        return addParam(Byte.toString(part));
+        return _addUrlPart(Byte.toString(part));
     }
 
     /**
@@ -520,21 +520,17 @@ public class Request implements Serializable
      * */
     public Request addUrlPart(Object part)
     {
-        return addParam(part == null ? null : part.toString());
+        return _addUrlPart(part == null ? null : part.toString());
     }
 
     /**
-     * This method is deprecated, use {@link #addUrlPart(String)} instead
-     * Add parameters for request
-     * @param value url encoded param eg.: www.example.com/controller/action/{parame1}/{param2}
-     * @return same object for method chaining
+     * Add url part
      * */
-    @Deprecated
-    public Request addParam(String value)
+    private Request _addUrlPart(String value)
     {
         if(value == null || value.isEmpty())
         {
-            if(SNet.LOGGING)Log.e(SNet.LOG_TAG, "RequestBuilder >> addParam : param not set");
+            if(SNet.LOGGING)Log.e(SNet.LOG_TAG, "RequestBuilder >> _addUrlPart : param not set");
             return this;
         }
         if(builder.length() == 0)
@@ -548,6 +544,14 @@ public class Request implements Serializable
         }
         builder.append(value.startsWith("/") ? value.substring(1, value.length()) : value);
         return this;
+    }
+
+    /**
+     * Remove parameter. This removes from both url and post params*/
+    public void removeParam(String key)
+    {
+        urlParams.remove(key);
+        postParams.remove(key);
     }
 
     /**
