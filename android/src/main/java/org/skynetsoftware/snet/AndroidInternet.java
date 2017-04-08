@@ -29,7 +29,7 @@ public class AndroidInternet extends Internet
     @Override
     protected InputStream rescaleImageIfNecessary(org.skynetsoftware.snet.Request.UploadFile file)
     {
-        InputStream boundsStream = null, fullStream = null, fallbackStream = null;
+        InputStream boundsStream = null, fullStream = null;
         try
         {
             boundsStream = createInputStreamFromUploadFile(file);
@@ -92,8 +92,7 @@ public class AndroidInternet extends Internet
                 }
             }
             //since we used input stream above, create new one here
-            fallbackStream = createInputStreamFromUploadFile(file);
-            return fallbackStream;
+            return createInputStreamFromUploadFile(file);
         }
         catch (IOException e)
         {
@@ -101,7 +100,7 @@ public class AndroidInternet extends Internet
         }
         finally
         {
-            close(boundsStream, fullStream, fallbackStream);
+            close(boundsStream, fullStream);
         }
     }
 
