@@ -3,7 +3,9 @@ package org.skynetsoftware.snet;
 import android.util.Log;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Random;
 
 
@@ -19,7 +21,7 @@ import java.util.Random;
 
 public class Request implements Serializable
 {
-    private static String DEFAULT_REQUEST_ROOT = null;
+    private static String DEFAULT_REQUEST_URL = null;
 
     /**
      * HTTP method used for this request*/
@@ -30,12 +32,12 @@ public class Request implements Serializable
 
     /**
      * Method for making HTTP POST request*/
-    public enum PostMethod
+    public enum BodyType
     {
         /**
          * Data will be sent as raw bytes(or text), you should specify Content-Type if you use this method<br>
          * You must set data with {@link #setRequestBody(String)}*/
-        BODY,
+        RAW,
 
         /**
          * This is used for normal HTTP posts, when you just need to send text to server<br>
@@ -47,133 +49,118 @@ public class Request implements Serializable
         FORM_DATA
     }
 
-    private StringBuilder builder;
-    private HashMap<String, String> postParams = new HashMap<>();
-    private HashMap<String, String> urlParams = new HashMap<>();
+    private StringBuilder mUrlBuilder;
+    private List<Param> mParams = new ArrayList<>();
 
     @NonNull
     private final Method mMethod;
 
     /**
      * */
-    private String requestUrl = DEFAULT_REQUEST_ROOT;
+    private String mRequestUrl = DEFAULT_REQUEST_URL;
 
     /**
      * Method for POST request<br>
-     * For now either {@link PostMethod#BODY}, {@link PostMethod#X_WWW_FORM_URL_ENCODED} or {@link PostMethod#FORM_DATA}<br>
+     * For now either {@link BodyType#RAW}, {@link BodyType#X_WWW_FORM_URL_ENCODED} or {@link BodyType#FORM_DATA}<br>
      * Cannot be null<br>
-     * Default is {@link PostMethod#X_WWW_FORM_URL_ENCODED}*/
+     * Default is {@link BodyType#X_WWW_FORM_URL_ENCODED}*/
     @NonNull
-    private PostMethod postMethod = PostMethod.X_WWW_FORM_URL_ENCODED;
+    private BodyType mBodyType = BodyType.X_WWW_FORM_URL_ENCODED;
 
     /**
      * Content type for request<br>
-     * Only used if PostMethod is {@link PostMethod#BODY}'*/
-    private String contentType = "text/plain";
+     * Only used if BodyType is {@link BodyType#RAW}'*/
+    private String mContentType = "text/plain";
 
     /**
-     * Raw body if post method is {@link PostMethod#BODY}*/
+     * Raw body if post method is {@link BodyType#RAW}*/
     @Nullable
-    private String requestBody;
+    private String mRequestBody;
 
     /**
-     * Post parameter name for file upload<br>
-     * Used only with {@link PostMethod#FORM_DATA}<br>*/
-    private String fileParamName = "file";
-
-    /**
-     * Array of files to upload to server<br>
-     * Used only with {@link PostMethod#FORM_DATA}<br>*/
+     * Array of mFiles to upload to server<br>
+     * Used only with {@link BodyType#FORM_DATA}<br>*/
     @Nullable
-    private UploadFile[] files;
+    private UploadFile[] mFiles;
 
-    private transient int maxRetries = 3;
-    public int retriesLeft = maxRetries;
+    private transient int mMaxRetries = 3;
+    public int retriesLeft = mMaxRetries;
 
     private boolean mAllowEmptyValues;
 
-    private org.skynetsoftware.snet.ResponseHandler.ResponseMessagePolicy responseMessagePolicy = ResponseHandler.DEFAULT_RESPONSE_MESSAGE_POLICY;
+    private ResponseHandler.ResponseMessagePolicy mResponseMessagePolicy = ResponseHandler.DEFAULT_RESPONSE_MESSAGE_POLICY;
 
-    private HashMap<String, String> headers = new HashMap<>();
+    private HashMap<String, String> mHeaders = new HashMap<>();
 
-    private org.skynetsoftware.snet.RequestHandler mRequestHandler;
+    private RequestHandler mRequestHandler;
 
     /**
-     * Create new request builder<br>
+     * Create new request mUrlBuilder<br>
      * If no other option is specified default options are:
      * <pre>
-     * * requestUrl - {@link #DEFAULT_REQUEST_ROOT}
-     * * postMethod - {@link PostMethod#X_WWW_FORM_URL_ENCODED}
-     * * contentType - "text/plain"
+     * * mRequestUrl - {@link #DEFAULT_REQUEST_URL}
+     * * postMethod - {@link BodyType#X_WWW_FORM_URL_ENCODED}
+     * * mContentType - "text/plain"
      * </pre>
      * @param method HTTP method for this request*/
     public Request(@NonNull Method method)
     {
         mMethod = method;
-        builder = new StringBuilder();
-    }
-
-    /**Set parameter name for file that is uploading to server.
-     * @param fileParamName name of the file param
-     * @return this obejct for method chaining*/
-    public Request setFileParamName(String fileParamName)
-    {
-        this.fileParamName = fileParamName;
-        return this;
+        mUrlBuilder = new StringBuilder();
     }
 
     /**
      * Set request body.<br>
-     * This is only used with {@link PostMethod#BODY}
+     * This is only used with {@link BodyType#RAW}
      * @param body body for this request
      * @return this object for method chaining*/
     public Request setRequestBody(@Nullable String body)
     {
-        this.requestBody = body;
-        if(!isEmpty(requestBody))
-            setPostMethod(PostMethod.BODY);
+        this.mRequestBody = body;
+        if(!isEmpty(mRequestBody))
+            setBodyType(BodyType.RAW);
         return this;
     }
 
     /**
      * Set request content-type.<br>
-     * This is only used with {@link PostMethod#BODY}
+     * This is only used with {@link BodyType#RAW}
      * @param contentType content type for for request (application/json)
      * @return this object for method chaining*/
     public Request setContentType(String contentType)
     {
-        this.contentType = contentType;
+        this.mContentType = contentType;
         return this;
     }
 
     /**
      * Set HTTP POST method to use
-     * @param postMethod HTTP POST method
+     * @param bodyType HTTP POST method
      * @return this object for method chaining*/
-    public Request setPostMethod(@NonNull PostMethod postMethod)
+    public Request setBodyType(@NonNull BodyType bodyType)
     {
-        this.postMethod = postMethod;
-        if(postMethod != PostMethod.BODY && !isEmpty(requestBody))
+        this.mBodyType = bodyType;
+        if(bodyType != BodyType.RAW && !isEmpty(mRequestBody))
         {
-            if(SNet.LOGGING) Log.w(SNet.LOG_TAG, "Warning. requestBody is not empty, it will be ignored since new PostMethod is not PostMethod.BODY");
+            if(SNet.LOGGING) Log.w(SNet.LOG_TAG, "Warning. mRequestBody is not empty, it will be ignored since new BodyType is not BodyType.RAW");
         }
-        if(postMethod != PostMethod.FORM_DATA && (files != null && files.length > 0))
+        if(bodyType != BodyType.FORM_DATA && (mFiles != null && mFiles.length > 0))
         {
-            if(SNet.LOGGING)Log.w(SNet.LOG_TAG, "Warning. Files will be ignored since new PostMethod is not PostMethod.FORM_DATA");
+            if(SNet.LOGGING)Log.w(SNet.LOG_TAG, "Warning. Files will be ignored since new BodyType is not BodyType.FORM_DATA");
         }
         return this;
     }
 
     /**
-     * Set list of files for uploading
-     * @param files list of files to upload
+     * Set list of mFiles for uploading
+     * @param files list of mFiles to upload
      * @see UploadFile
      * @return same object for method chaining*/
     public Request setFiles(@Nullable UploadFile... files)
     {
-        this.files = files;
+        this.mFiles = files;
         if(files != null && files.length > 0)
-            setPostMethod(PostMethod.FORM_DATA);
+            setBodyType(BodyType.FORM_DATA);
         return this;
     }
 
@@ -185,7 +172,7 @@ public class Request implements Serializable
      * @return this object for method chaining*/
     public Request setRequestUrl(String url)
     {
-        requestUrl = url;
+        mRequestUrl = url;
         return this;
     }
 
@@ -195,7 +182,7 @@ public class Request implements Serializable
      * @return this object for method chaining*/
     public Request setMaxRetires(int maxRetries)
     {
-        this.maxRetries = maxRetries;
+        this.mMaxRetries = maxRetries;
         this.retriesLeft = maxRetries;
         return this;
     }
@@ -205,7 +192,7 @@ public class Request implements Serializable
      * */
     public int getMaxRetries()
     {
-        return maxRetries;
+        return mMaxRetries;
     }
 
     /**
@@ -317,6 +304,146 @@ public class Request implements Serializable
     }
 
     /**
+     * <pre>
+     * Set value of param
+     * If param doesn't exist it will be added
+     * Encoding of parameter is taken care of
+     * </pre>
+     * @param key parameter for this request. Passing null will not set action
+     * @param value value of this parameter. If param doesn't exist and value is empty or null, param wont be added
+     * @return same object for method chaining
+     * */
+    public Request setParam(String key, String value)
+    {
+        Param param = getParam(key);
+        if(param != null)
+            param.setValue(value);
+        else
+            addParam(key, value);
+        return this;
+    }
+
+    /**
+     * <pre>
+     * Set value of param
+     * If param doesn't exist it will be added
+     * Encoding of parameter is taken care of
+     * </pre>
+     * @param key parameter for this request. Passing null will not set action
+     * @param value value of this parameter. If param doesn't exist and value is empty or null, param wont be added
+     * @return same object for method chaining
+     * */
+    public Request setParam(String key, int value)
+    {
+        return setParam(key, Integer.toString(value));
+    }
+
+    /**
+     * <pre>
+     * Set value of param
+     * If param doesn't exist it will be added
+     * Encoding of parameter is taken care of
+     * </pre>
+     * @param key parameter for this request. Passing null will not set action
+     * @param value value of this parameter. If param doesn't exist and value is empty or null, param wont be added
+     * @return same object for method chaining
+     * */
+    public Request setParam(String key, long value)
+    {
+        return setParam(key, Long.toString(value));
+    }
+
+    /**
+     * <pre>
+     * Set value of param
+     * If param doesn't exist it will be added
+     * Encoding of parameter is taken care of
+     * </pre>
+     * @param key parameter for this request. Passing null will not set action
+     * @param value value of this parameter. If param doesn't exist and value is empty or null, param wont be added
+     * @return same object for method chaining
+     * */
+    public Request setParam(String key, float value)
+    {
+        return setParam(key, Float.toString(value));
+    }
+
+    /**
+     * <pre>
+     * Set value of param
+     * If param doesn't exist it will be added
+     * Encoding of parameter is taken care of
+     * </pre>
+     * @param key parameter for this request. Passing null will not set action
+     * @param value value of this parameter. If param doesn't exist and value is empty or null, param wont be added
+     * @return same object for method chaining
+     * */
+    public Request setParam(String key, double value)
+    {
+        return setParam(key, Double.toString(value));
+    }
+
+    /**
+     * <pre>
+     * Set value of param
+     * If param doesn't exist it will be added
+     * Encoding of parameter is taken care of
+     * </pre>
+     * @param key parameter for this request. Passing null will not set action
+     * @param value value of this parameter. If param doesn't exist and value is empty or null, param wont be added
+     * @return same object for method chaining
+     * */
+    public Request setParam(String key, boolean value)
+    {
+        return setParam(key, Boolean.toString(value));
+    }
+
+    /**
+     * <pre>
+     * Set value of param
+     * If param doesn't exist it will be added
+     * Encoding of parameter is taken care of
+     * </pre>
+     * @param key parameter for this request. Passing null will not set action
+     * @param value value of this parameter. If param doesn't exist and value is empty or null, param wont be added
+     * @return same object for method chaining
+     * */
+    public Request setParam(String key, short value)
+    {
+        return setParam(key, Short.toString(value));
+    }
+
+    /**
+     * <pre>
+     * Set value of param
+     * If param doesn't exist it will be added
+     * Encoding of parameter is taken care of
+     * </pre>
+     * @param key parameter for this request. Passing null will not set action
+     * @param value value of this parameter. If param doesn't exist and value is empty or null, param wont be added
+     * @return same object for method chaining
+     * */
+    public Request setParam(String key, byte value)
+    {
+        return setParam(key, Byte.toString(value));
+    }
+
+    /**
+     * <pre>
+     * Set value of param
+     * If param doesn't exist it will be added
+     * Encoding of parameter is taken care of
+     * </pre>
+     * @param key parameter for this request. Passing null will not set action
+     * @param value value of this parameter. If param doesn't exist and value is empty or null, param wont be added
+     * @return same object for method chaining
+     * */
+    public Request setParam(String key, Object value)
+    {
+        return setParam(key, value == null ? null : value.toString());
+    }
+
+    /**
      * Add parameters for request
      * Encoding of parameter is taken care of
      * @param key parameter for this request. Passing null will not set action
@@ -424,11 +551,11 @@ public class Request implements Serializable
         }
         if(forceAddToUrl || mMethod == Method.GET || mMethod == Method.DELETE)
         {
-            urlParams.put(key, SNetUtils.encodeString(value));
+            mParams.add(new Param(key, SNetUtils.encodeString(value), true));
         }
-        else if(mMethod == Method.POST || mMethod == Method.PUT)
+        else
         {
-            postParams.put(key, value);
+            mParams.add(new Param(key, value, false));
         }
         return this;
     }
@@ -533,25 +660,31 @@ public class Request implements Serializable
             if(SNet.LOGGING)Log.e(SNet.LOG_TAG, "RequestBuilder >> _addUrlPart : param not set");
             return this;
         }
-        if(builder.length() == 0)
+        if(mUrlBuilder.length() == 0)
         {
-            if(requestUrl != null && !requestUrl.endsWith("/"))
-                builder.append("/");
+            if(mRequestUrl != null && !mRequestUrl.endsWith("/"))
+                mUrlBuilder.append("/");
         }
-        else if(!builder.toString().endsWith("/"))
+        else if(!mUrlBuilder.toString().endsWith("/"))
         {
-            builder.append("/");
+            mUrlBuilder.append("/");
         }
-        builder.append(value.startsWith("/") ? value.substring(1, value.length()) : value);
+        mUrlBuilder.append(value.startsWith("/") ? value.substring(1, value.length()) : value);
         return this;
     }
 
     /**
-     * Remove parameter. This removes from both url and post params*/
+     * Remove parameter.*/
     public void removeParam(String key)
     {
-        urlParams.remove(key);
-        postParams.remove(key);
+        if(key == null || key.isEmpty())
+            return;
+        for(int i = mParams.size() - 1; i < 0; i--)
+        {
+            Param param = mParams.get(i);
+            if(key.equals(param.getKey()))
+                mParams.remove(i);
+        }
     }
 
     /**
@@ -561,55 +694,79 @@ public class Request implements Serializable
      * @return this for method chaining*/
     public Request addHeader(String header, String value)
     {
-        headers.put(header, value);
+        mHeaders.put(header, value);
         return this;
     }
 
     /**
-     * Get all user specified request headers. This will not return any header added by underlying http client implementation
-     * @return headers for this RequestBuilder*/
+     * Get all user specified request mHeaders. This will not return any header added by underlying http client implementation
+     * @return mHeaders for this RequestBuilder*/
     public HashMap<String, String> getHeaders()
     {
-        return headers;
+        return mHeaders;
     }
 
     /**
      * @return generate url parameters string. eg. username=pedja&amp;password=123456
      * */
-    public String getUrlParams()
+    public String buildUrl()
     {
-        String urlParts = builder.toString();
+        String urlParts = mUrlBuilder.toString();
         StringBuilder tmpBuilder = new StringBuilder();
-        for(String key : this.urlParams.keySet())
+        for(Param param : mParams)
         {
+            if(!param.isQueryParam)
+                continue;
             if(!tmpBuilder.toString().contains("?"))
                 tmpBuilder.append("?");
             else
                 tmpBuilder.append("&");
-            tmpBuilder.append(key).append("=").append(urlParams.get(key));
+            tmpBuilder.append(param.getKey()).append("=").append(param.getValue());
         }
-        return urlParts == null ? "" : urlParts + tmpBuilder.toString();
+        return urlParts + tmpBuilder.toString();
     }
 
-    public HashMap<String, String> getPOSTParams()
+    public List<Param> getParams()
     {
-        return postParams;
+        return mParams;
+    }
+
+    public List<Param> getBodyParams()
+    {
+        List<Param> params = new ArrayList<>();
+        for(Param param : mParams)
+        {
+            if(!param.isQueryParam)
+                params.add(param);
+        }
+        return params;
+    }
+
+    public List<Param> getQueryParams()
+    {
+        List<Param> params = new ArrayList<>();
+        for(Param param : mParams)
+        {
+            if(param.isQueryParam)
+                params.add(param);
+        }
+        return params;
     }
 
     /**
      * Get request url including url parameters
-     * @return request url for this request builder*/
+     * @return request url for this request mUrlBuilder*/
     public String getRequestUrl()
     {
-        return requestUrl + getUrlParams();
+        return mRequestUrl + buildUrl();
     }
 
     /**
      * Get the response message policy for this request
      * @return response message policy. Null is returned only if policy is explicitly set to null*/
-    public org.skynetsoftware.snet.ResponseHandler.ResponseMessagePolicy getResponseMessagePolicy()
+    public ResponseHandler.ResponseMessagePolicy getResponseMessagePolicy()
     {
-        return responseMessagePolicy;
+        return mResponseMessagePolicy;
     }
 
     /**
@@ -619,7 +776,7 @@ public class Request implements Serializable
      * @return this for call chain*/
     public Request setResponseMessagePolicy(org.skynetsoftware.snet.ResponseHandler.ResponseMessagePolicy responseMessagePolicy)
     {
-        this.responseMessagePolicy = responseMessagePolicy;
+        this.mResponseMessagePolicy = responseMessagePolicy;
         return this;
     }
 
@@ -629,31 +786,26 @@ public class Request implements Serializable
     }
 
     @NonNull
-    public PostMethod getPostMethod()
+    public BodyType getBodyType()
     {
-        return postMethod;
+        return mBodyType;
     }
 
     public String getContentType()
     {
-        return contentType;
+        return mContentType;
     }
 
     @Nullable
     public String getRequestBody()
     {
-        return requestBody;
+        return mRequestBody;
     }
 
     @Nullable
     public UploadFile[] getFiles()
     {
-        return files;
-    }
-
-    public String getFileParamName()
-    {
-        return fileParamName;
+        return mFiles;
     }
 
     /**
@@ -662,17 +814,18 @@ public class Request implements Serializable
      * @param url default request url*/
     public static void setDefaultRequestUrl(String url)
     {
-        DEFAULT_REQUEST_ROOT = url;
+        DEFAULT_REQUEST_URL = url;
     }
 
-    public String getParam(String key)
+    public Param getParam(String key)
     {
-        String urlParam = urlParams.get(key);
-        if(urlParam != null)
-            return urlParam;
-        String postParam = postParams.get(key);
-        if(postParam != null)
-            return postParam;
+        if(key == null || key.isEmpty())
+            return null;
+        for(Param param : mParams)
+        {
+            if(key.equals(param.key))
+                return param;
+        }
         return null;
     }
 
@@ -681,12 +834,12 @@ public class Request implements Serializable
         this.mAllowEmptyValues = allowEmptyValues;
     }
 
-    public org.skynetsoftware.snet.RequestHandler getRequestHandler()
+    public RequestHandler getRequestHandler()
     {
         return mRequestHandler;
     }
 
-    public void setRequestHandler(org.skynetsoftware.snet.RequestHandler requestHandler)
+    public void setRequestHandler(RequestHandler requestHandler)
     {
         this.mRequestHandler = requestHandler;
     }
@@ -718,7 +871,7 @@ public class Request implements Serializable
 
     /**
      * Wrapper for file that sould be uploaded<br>
-     * Used only with {@link PostMethod#BODY}*/
+     * Used only with {@link BodyType#RAW}*/
     public static class UploadFile
     {
         /**
@@ -741,6 +894,11 @@ public class Request implements Serializable
          *
          * </pre>*/
         private int maxImageSize;
+
+        /**
+         * Post parameter name for file upload<br>
+         * Used only with {@link BodyType#FORM_DATA}<br>*/
+        private String fileParamName = "file";
 
         @NonNull
         public String getUri()
@@ -782,6 +940,18 @@ public class Request implements Serializable
         {
             this.maxImageSize = maxImageSize;
         }
+
+        /**Set parameter name for file that is uploading to server.
+         * @param fileParamName name of the file param*/
+        public void setFileParamName(String fileParamName)
+        {
+            this.fileParamName = fileParamName;
+        }
+
+        public String getFileParamName()
+        {
+            return fileParamName;
+        }
     }
 
     private static boolean isEmpty(@Nullable CharSequence str)
@@ -792,5 +962,50 @@ public class Request implements Serializable
     public interface ResponseListener
     {
         void onResponse(ResponseParser responseParser);
+    }
+
+    public static class Param
+    {
+        private final String key;
+        private String value;
+        private boolean isQueryParam;
+
+        public Param(String key, String value, boolean isQueryParam)
+        {
+            this.key = key;
+            this.value = value;
+            this.isQueryParam = isQueryParam;
+        }
+
+        public Param(String key, String value)
+        {
+            this.key = key;
+            this.value = value;
+        }
+
+        public String getKey()
+        {
+            return key;
+        }
+
+        public String getValue()
+        {
+            return value;
+        }
+
+        public boolean isQueryParam()
+        {
+            return isQueryParam;
+        }
+
+        public void setQueryParam(boolean queryParam)
+        {
+            isQueryParam = queryParam;
+        }
+
+        public void setValue(String value)
+        {
+            this.value = value;
+        }
     }
 }

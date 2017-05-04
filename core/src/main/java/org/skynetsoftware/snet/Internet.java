@@ -80,11 +80,11 @@ public class Internet
                     break;
                 case POST:
                     conn.setDoOutput(true);
-                    switch (request.getPostMethod())
+                    switch (request.getBodyType())
                     {
-                        case BODY:
+                        case RAW:
                             if (request.getRequestBody() == null)
-                                throw new IllegalArgumentException("body cannot be null if post method is BODY");
+                                throw new IllegalArgumentException("body cannot be null if post method is RAW");
                             conn.setRequestProperty("Content-Type", request.getContentType());
                             conn.setRequestProperty("Content-Length", Integer.toString(request.getRequestBody().getBytes().length));
                             DataOutputStream wr = new DataOutputStream(conn.getOutputStream());
@@ -100,13 +100,13 @@ public class Internet
                             conn.setRequestProperty("Content-Type", "multipart/form-data; boundary=" + BOUNDARY);
                             OutputStream os = conn.getOutputStream();
                             PrintWriter writer = new PrintWriter(new OutputStreamWriter(os, ENCODING), true);
-                            for (String key : request.getPOSTParams().keySet())
+                            for (Request.Param param : request.getBodyParams())
                             {
                                 writer.append("--").append(BOUNDARY).append(MULTI_PART_LINE_FEED);
-                                writer.append("Content-Disposition: form-data; name=\"").append(key).append("\"").append(MULTI_PART_LINE_FEED);
+                                writer.append("Content-Disposition: form-data; name=\"").append(param.getKey()).append("\"").append(MULTI_PART_LINE_FEED);
                                 writer.append("Content-Type: text/plain; charset=" + ENCODING).append(MULTI_PART_LINE_FEED);
                                 writer.append(MULTI_PART_LINE_FEED);
-                                writer.append(request.getPOSTParams().get(key)).append(MULTI_PART_LINE_FEED);
+                                writer.append(param.getValue()).append(MULTI_PART_LINE_FEED);
                                 writer.flush();
                             }
 
@@ -117,7 +117,7 @@ public class Internet
                                     Request.UploadFile file = request.getFiles()[i];
 
                                     writer.append("--").append(BOUNDARY).append(MULTI_PART_LINE_FEED);
-                                    writer.append("Content-Disposition: form-data; name=\"").append(request.getFileParamName()).append(Integer.toString(i)).append("\"; filename=\"").append(file.getFileName()).append("\"").append(MULTI_PART_LINE_FEED);
+                                    writer.append("Content-Disposition: form-data; name=\"").append(file.getFileParamName()).append(Integer.toString(i)).append("\"; filename=\"").append(file.getFileName()).append("\"").append(MULTI_PART_LINE_FEED);
                                     writer.append("Content-Type: ").append(URLConnection.guessContentTypeFromName(file.getFileName())).append(MULTI_PART_LINE_FEED);
                                     writer.append("Content-Transfer-Encoding: binary").append(MULTI_PART_LINE_FEED);
                                     writer.append(MULTI_PART_LINE_FEED);
@@ -212,13 +212,13 @@ public class Internet
     }
 
     /**
-     * Set parameters for {@link Request.PostMethod#X_WWW_FORM_URL_ENCODED}*/
+     * Set parameters for {@link Request.BodyType#X_WWW_FORM_URL_ENCODED}*/
     protected static void setXWwwFormUrlEncodedParams(HttpURLConnection conn, Request requestBuilder) throws IOException
     {
         StringBuilder builder = new StringBuilder();
-        for (String key : requestBuilder.getPOSTParams().keySet())
+        for (Request.Param param : requestBuilder.getBodyParams())
         {
-            builder.append("&").append(key).append("=").append(SNetUtils.encodeString(requestBuilder.getPOSTParams().get(key)));
+            builder.append("&").append(param.getKey()).append("=").append(SNetUtils.encodeString(param.getValue()));
         }
         conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
         conn.setRequestProperty("Content-Length", Integer.toString(builder.toString().getBytes().length));
