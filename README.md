@@ -3,6 +3,10 @@ ts-http
 
 Async http library
 
+[![Quality Gate](http://skynetsoftware.org:9000/api/badges/gate?key=snet)](http://skynetsoftware.org:9000/dashboard/index/snet)
+[![Quality Gate](http://skynetsoftware.org:9000/api/badges/measure?key=snet&metric=ncloc)](http://skynetsoftware.org:9000/dashboard/index/snet)
+[![Quality Gate](http://skynetsoftware.org:9000/api/badges/measure?key=snet&metric=vulnerabilities)](http://skynetsoftware.org:9000/dashboard/index/snet)
+[![Quality Gate](http://skynetsoftware.org:9000/api/badges/measure?key=snet&metric=bugs)](http://skynetsoftware.org:9000/dashboard/index/snet)
 
 Usage
 =====
